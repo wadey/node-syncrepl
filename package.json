@@ -2,7 +2,7 @@
   "name": "syncrepl",
   "description": "REPL that makes doing async calls easier",
   "keywords": ["sync", "repl"],
-  "version": "0.2.0",
+  "version": "0.4.0",
   "homepage": "http://github.com/wadey/node-syncrepl",
   "repository": {
     "type": "git",
@@ -10,7 +10,7 @@
   },
   "author": "Wade Simmons <wade@wades.im> (http://wades.im/mons)",
   "engines": {
-    "node": "< 0.3.0"
+    "node": ">= 0.4.0"
   },
   "main": "./syncrepl",
   "bin": {
