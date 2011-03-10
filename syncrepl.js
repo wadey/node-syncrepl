@@ -20,6 +20,8 @@ var fs = require("fs");
 var rl = require('readline');
 var context;
 
+var syncfunc = require('./syncfunc');
+
 var disableColors = process.env.NODE_DISABLE_COLORS ? true : false;
 
 function cwdRequire (id) {
@@ -86,15 +88,32 @@ function REPLServer(prompt, stream) {
     // display next prompt and return.
     if (self.parseREPLKeyword(cmd) === true) return;
 
+    var async = false;
+
     // The catchall for errors
     try {
       self.buffered_cmd += cmd;
       // This try is for determining if the command is complete, or should
       // continue onto the next line.
       try {
+        var sync = context.sync = syncfunc(cmd, context, function(e, ret) {
+          if (e) {
+            if (e.stack) {
+              self.stream.write(e.stack + "\n");
+            } else {
+              self.stream.write(e.toString() + "\n");
+            }
+          } else {
+            context._ = ret;
+            self.stream.write(exports.writer(ret) + "\n");
+          }
+          self.buffered_cmd = '';
+          self.displayPrompt();
+        })
         // Use evalcx to supply the global context
         var ret = evalcx(self.buffered_cmd, context, "repl");
-        if (ret !== undefined) {
+        async = syncfunc.called(sync);
+        if (!async && ret !== undefined) {
           context._ = ret;
           self.stream.write(exports.writer(ret) + "\n");
         }
@@ -116,7 +135,9 @@ function REPLServer(prompt, stream) {
       self.buffered_cmd = '';
     }
 
-    self.displayPrompt();
+    if (!async) {
+      self.displayPrompt();
+    }
   });
 
   rli.addListener('close', function () {
@@ -449,3 +470,7 @@ REPLServer.prototype.convertToContext = function (cmd) {
 
   return cmd;
 };
+
+if (process.mainModule === module) {
+  exports.start();
+}
