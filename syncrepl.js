@@ -1,3 +1,25 @@
+// Copyright Joyent, Inc. and other Node contributors.
+// - syncrepl modifications copyright Wade Simmons.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 /* A repl library that you can include in your own code to get a runtime
  * interface to your program.
  *
@@ -74,7 +96,7 @@ function REPLServer(prompt, stream) {
     process.stdin.resume();
   }
 
-  self.prompt = prompt || '> ';
+  self.prompt = (prompt != undefined ? prompt : '> ');
 
   function complete(text) {
     return self.complete(text);
@@ -86,7 +108,7 @@ function REPLServer(prompt, stream) {
   this.commands = {};
   defineDefaultCommands(this);
 
-  if (rli.enabled && !disableColors) {
+  if (rli.enabled && !disableColors && exports.writer === util.inspect) {
     // Turn on ANSI coloring.
     exports.writer = function(obj, showHidden, depth) {
       return util.inspect(obj, showHidden, depth, true);
