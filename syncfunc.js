@@ -3,7 +3,7 @@ function attachGetters(sync, target, vars, possibleVars) {
     if (Object.hasOwnProperty.call(vars, k)) {
       (function(k) {
         Object.defineProperty(target, k, {get: function() { return sync(k) }})
-      })(k);
+      })(k)
     }
   }
   if (possibleVars) {
@@ -18,32 +18,24 @@ function attachGetters(sync, target, vars, possibleVars) {
 module.exports = function(cmd, context, callback) {
   var possibleVars
     , stack = []
-    , match = /\bsync\.([\w.]+)\b/g.exec(cmd);
+    , match = /\bsync\.([\w.]+)\b/g.exec(cmd)
+
   if (match) {
     possibleVars = match[1].split('.')
   }
 
-  var sync = function(syncVar) {
-    if (syncVar) {
+  var sync = function() {
+    Array.prototype.slice.call(arguments, 0).forEach(function(syncVar) {
       stack.push(syncVar)
-    }
-    var extraVars = Array.prototype.slice.call(arguments, 1)
+    })
     sync.__called = true
-    var asyncFunc = function(e, ret) {
-      if (e) return callback(e)
+    var asyncFunc = function() {
+      var args = arguments
 
-      var args = arguments;
       if (stack.length > 0) {
         stack.forEach(function(syncVar, i) {
           if (syncVar) {
-            context[syncVar] = args[i+1];
-          }
-        })
-      }
-      if (extraVars.length > 0) {
-        extraVars.forEach(function(extraVar, i) {
-          if (extraVar) {
-            context[extraVar] = args[i+1+stack.length]
+            context[syncVar] = args[i+1]
           }
         })
       }
@@ -57,6 +49,10 @@ module.exports = function(cmd, context, callback) {
   }
 
   attachGetters(sync, sync, context, possibleVars)
+
+  sync.inspect = function() {
+    return "Usage: pass sync() or sync.<varName> as the callback param."
+  }
 
   return sync
 }
