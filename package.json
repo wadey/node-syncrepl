@@ -10,7 +10,7 @@
   },
   "author": "Wade Simmons <wade@wades.im> (http://wades.im/mons)",
   "engines": {
-    "node": ">= 0.4.0"
+    "node": ">= 0.8.0"
   },
   "main": "./syncrepl",
   "bin": {
