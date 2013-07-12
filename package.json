@@ -1,8 +1,11 @@
 {
   "name": "syncrepl",
   "description": "REPL that makes doing async calls easier",
-  "keywords": ["sync", "repl"],
-  "version": "0.4.1",
+  "keywords": [
+    "sync",
+    "repl"
+  ],
+  "version": "0.8.25",
   "homepage": "http://github.com/wadey/node-syncrepl",
   "repository": {
     "type": "git",
